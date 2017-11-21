@@ -1,0 +1,5 @@
+illumination=other,day,night,dawn,dusk,direct sun
+weather=other,normal,rain,snow,fog
+road_type=other,country road,highway
+road_event=other,normal,tunnel,construction site
+country=other,germany,france,spain,italy

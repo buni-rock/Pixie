@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="pixie" default="all">
+  
+  
+  <property file="pixie.properties"/>
+  <!-- Uncomment the following property if no tests compilation is needed -->
+  <!-- 
+  <property name="skip.tests" value="true"/>
+   -->
+  
+  <!-- Compiler options -->
+  
+  <property name="compiler.debug" value="on"/>
+  <property name="compiler.generate.no.warnings" value="off"/>
+  <property name="compiler.args" value=""/>
+  <property name="compiler.max.memory" value="700m"/>
+  <patternset id="ignored.files">
+    <exclude name="**/*.hprof/**"/>
+    <exclude name="**/*.pyc/**"/>
+    <exclude name="**/*.pyo/**"/>
+    <exclude name="**/*.rbc/**"/>
+    <exclude name="**/*.yarb/**"/>
+    <exclude name="**/*~/**"/>
+    <exclude name="**/.DS_Store/**"/>
+    <exclude name="**/.git/**"/>
+    <exclude name="**/.hg/**"/>
+    <exclude name="**/.svn/**"/>
+    <exclude name="**/CVS/**"/>
+    <exclude name="**/__pycache__/**"/>
+    <exclude name="**/_svn/**"/>
+    <exclude name="**/vssver.scc/**"/>
+    <exclude name="**/vssver2.scc/**"/>
+  </patternset>
+  <patternset id="library.patterns">
+    <include name="*.war"/>
+    <include name="*.swc"/>
+    <include name="*.zip"/>
+    <include name="*.egg"/>
+    <include name="*.ane"/>
+    <include name="*.jar"/>
+    <include name="*.ear"/>
+  </patternset>
+  <patternset id="compiler.resources">
+    <exclude name="**/?*.java"/>
+    <exclude name="**/?*.form"/>
+    <exclude name="**/?*.class"/>
+    <exclude name="**/?*.groovy"/>
+    <exclude name="**/?*.scala"/>
+    <exclude name="**/?*.flex"/>
+    <exclude name="**/?*.kt"/>
+    <exclude name="**/?*.clj"/>
+    <exclude name="**/?*.aj"/>
+  </patternset>
+  
+  <!-- JDK definitions -->
+  
+  <property name="jdk.bin.9" value="${jdk.home.9}/bin"/>
+  <path id="jdk.classpath.9">
+    <fileset dir="${jdk.home.9}">
+      <include name="../jdk-9!/java.activation"/>
+      <include name="../jdk-9!/java.base"/>
+      <include name="../jdk-9!/java.compiler"/>
+      <include name="../jdk-9!/java.corba"/>
+      <include name="../jdk-9!/java.datatransfer"/>
+      <include name="../jdk-9!/java.desktop"/>
+      <include name="../jdk-9!/java.instrument"/>
+      <include name="../jdk-9!/java.jnlp"/>
+      <include name="../jdk-9!/java.logging"/>
+      <include name="../jdk-9!/java.management"/>
+      <include name="../jdk-9!/java.management.rmi"/>
+      <include name="../jdk-9!/java.naming"/>
+      <include name="../jdk-9!/java.prefs"/>
+      <include name="../jdk-9!/java.rmi"/>
+      <include name="../jdk-9!/java.scripting"/>
+      <include name="../jdk-9!/java.se"/>
+      <include name="../jdk-9!/java.se.ee"/>
+      <include name="../jdk-9!/java.security.jgss"/>
+      <include name="../jdk-9!/java.security.sasl"/>
+      <include name="../jdk-9!/java.smartcardio"/>
+      <include name="../jdk-9!/java.sql"/>
+      <include name="../jdk-9!/java.sql.rowset"/>
+      <include name="../jdk-9!/java.transaction"/>
+      <include name="../jdk-9!/java.xml"/>
+      <include name="../jdk-9!/java.xml.bind"/>
+      <include name="../jdk-9!/java.xml.crypto"/>
+      <include name="../jdk-9!/java.xml.ws"/>
+      <include name="../jdk-9!/java.xml.ws.annotation"/>
+      <include name="../jdk-9!/javafx.base"/>
+      <include name="../jdk-9!/javafx.controls"/>
+      <include name="../jdk-9!/javafx.deploy"/>
+      <include name="../jdk-9!/javafx.fxml"/>
+      <include name="../jdk-9!/javafx.graphics"/>
+      <include name="../jdk-9!/javafx.media"/>
+      <include name="../jdk-9!/javafx.swing"/>
+      <include name="../jdk-9!/javafx.web"/>
+      <include name="../jdk-9!/jdk.accessibility"/>
+      <include name="../jdk-9!/jdk.attach"/>
+      <include name="../jdk-9!/jdk.charsets"/>
+      <include name="../jdk-9!/jdk.compiler"/>
+      <include name="../jdk-9!/jdk.crypto.cryptoki"/>
+      <include name="../jdk-9!/jdk.crypto.ec"/>
+      <include name="../jdk-9!/jdk.crypto.mscapi"/>
+      <include name="../jdk-9!/jdk.deploy"/>
+      <include name="../jdk-9!/jdk.deploy.controlpanel"/>
+      <include name="../jdk-9!/jdk.dynalink"/>
+      <include name="../jdk-9!/jdk.editpad"/>
+      <include name="../jdk-9!/jdk.hotspot.agent"/>
+      <include name="../jdk-9!/jdk.httpserver"/>
+      <include name="../jdk-9!/jdk.incubator.httpclient"/>
+      <include name="../jdk-9!/jdk.internal.ed"/>
+      <include name="../jdk-9!/jdk.internal.jvmstat"/>
+      <include name="../jdk-9!/jdk.internal.le"/>
+      <include name="../jdk-9!/jdk.internal.opt"/>
+      <include name="../jdk-9!/jdk.internal.vm.ci"/>
+      <include name="../jdk-9!/jdk.jartool"/>
+      <include name="../jdk-9!/jdk.javadoc"/>
+      <include name="../jdk-9!/jdk.javaws"/>
+      <include name="../jdk-9!/jdk.jcmd"/>
+      <include name="../jdk-9!/jdk.jconsole"/>
+      <include name="../jdk-9!/jdk.jdeps"/>
+      <include name="../jdk-9!/jdk.jdi"/>
+      <include name="../jdk-9!/jdk.jdwp.agent"/>
+      <include name="../jdk-9!/jdk.jfr"/>
+      <include name="../jdk-9!/jdk.jlink"/>
+      <include name="../jdk-9!/jdk.jshell"/>
+      <include name="../jdk-9!/jdk.jsobject"/>
+      <include name="../jdk-9!/jdk.jstatd"/>
+      <include name="../jdk-9!/jdk.localedata"/>
+      <include name="../jdk-9!/jdk.management"/>
+      <include name="../jdk-9!/jdk.management.agent"/>
+      <include name="../jdk-9!/jdk.naming.dns"/>
+      <include name="../jdk-9!/jdk.naming.rmi"/>
+      <include name="../jdk-9!/jdk.net"/>
+      <include name="../jdk-9!/jdk.pack"/>
+      <include name="../jdk-9!/jdk.packager"/>
+      <include name="../jdk-9!/jdk.packager.services"/>
+      <include name="../jdk-9!/jdk.plugin"/>
+      <include name="../jdk-9!/jdk.plugin.dom"/>
+      <include name="../jdk-9!/jdk.plugin.server"/>
+      <include name="../jdk-9!/jdk.policytool"/>
+      <include name="../jdk-9!/jdk.rmic"/>
+      <include name="../jdk-9!/jdk.scripting.nashorn"/>
+      <include name="../jdk-9!/jdk.scripting.nashorn.shell"/>
+      <include name="../jdk-9!/jdk.sctp"/>
+      <include name="../jdk-9!/jdk.security.auth"/>
+      <include name="../jdk-9!/jdk.security.jgss"/>
+      <include name="../jdk-9!/jdk.snmp"/>
+      <include name="../jdk-9!/jdk.unsupported"/>
+      <include name="../jdk-9!/jdk.xml.bind"/>
+      <include name="../jdk-9!/jdk.xml.dom"/>
+      <include name="../jdk-9!/jdk.xml.ws"/>
+      <include name="../jdk-9!/jdk.zipfs"/>
+      <include name="../jdk-9!/oracle.desktop"/>
+      <include name="../jdk-9!/oracle.net"/>
+    </fileset>
+  </path>
+  
+  <property name="project.jdk.home" value="${jdk.home.9}"/>
+  <property name="project.jdk.bin" value="${jdk.bin.9}"/>
+  <property name="project.jdk.classpath" value="jdk.classpath.9"/>
+  
+  
+  <!-- Project Libraries -->
+  
+  <path id="library.communication.classpath">
+    <fileset dir="${basedir}/../../../../03_Libs/InternalLibs/Communication/bin">
+      <patternset refid="library.patterns"/>
+    </fileset>
+  </path>
+  
+  <path id="library.jocl.classpath">
+    <fileset dir="${basedir}/../../../../03_Libs/Jocl">
+      <patternset refid="library.patterns"/>
+    </fileset>
+  </path>
+  
+  <path id="library.jpen_2.classpath">
+    <fileset dir="${basedir}/../../../../03_Libs/jpen_2">
+      <patternset refid="library.patterns"/>
+    </fileset>
+  </path>
+  
+  <path id="library.json.classpath">
+    <fileset dir="${basedir}/../../../../03_Libs/JSON">
+      <patternset refid="library.patterns"/>
+    </fileset>
+  </path>
+  
+  <path id="library.junit.classpath">
+    <fileset dir="${basedir}/../../../../03_Libs/JUnit">
+      <patternset refid="library.patterns"/>
+    </fileset>
+  </path>
+  
+  <path id="library.logback.classpath">
+    <fileset dir="${basedir}/../../../../03_Libs/Logger/logback">
+      <patternset refid="library.patterns"/>
+    </fileset>
+  </path>
+  
+  <path id="library.opencv.classpath">
+    <fileset dir="${basedir}/../../../../03_Libs/opencv">
+      <patternset refid="library.patterns"/>
+    </fileset>
+  </path>
+  
+  <path id="library.pixelsegmentation.classpath">
+    <fileset dir="${basedir}/../../../../03_Libs/InternalLibs/PixelSegmentation/bin">
+      <patternset refid="library.patterns"/>
+    </fileset>
+  </path>
+  
+  <path id="library.slf4j.classpath">
+    <fileset dir="${basedir}/../../../../03_Libs/Logger/slf4j">
+      <patternset refid="library.patterns"/>
+    </fileset>
+  </path>
+  
+  <path id="library.video.classpath">
+    <fileset dir="${basedir}/../../../../03_Libs/InternalLibs/Video/bin">
+      <patternset refid="library.patterns"/>
+    </fileset>
+  </path>
+  <!-- Register Custom Compiler Taskdefs -->
+  <property name="javac2.home" value="${idea.home}/lib"/>
+  <path id="javac2.classpath">
+    <pathelement location="${javac2.home}/javac2.jar"/>
+    <pathelement location="${javac2.home}/jdom.jar"/>
+    <pathelement location="${javac2.home}/asm-all.jar"/>
+    <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
+  </path>
+  <target name="register.custom.compilers">
+    <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.classpath"/>
+    <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions" classpathref="javac2.classpath"/>
+  </target>
+  
+  <!-- Modules -->
+  
+  <import file="${basedir}/module_pixie.xml"/>
+  
+  <target name="init" description="Build initialization">
+    <!-- Perform any build initialization in this target -->
+  </target>
+  
+  <target name="clean" depends="clean.module.pixie" description="cleanup all"/>
+  
+  <target name="build.modules" depends="init, clean, compile.module.pixie" description="build all modules"/>
+  
+  <target name="init.artifacts">
+    <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>
+    <property name="artifact.output.pixie" value="${basedir}/../../../../../05_Deliverables/bin"/>
+    <mkdir dir="${artifacts.temp.dir}"/>
+    <property name="temp.jar.path.Pixie.jar" value="${artifacts.temp.dir}/Pixie.jar"/>
+  </target>
+  
+  <target name="artifact.pixie" depends="init.artifacts, compile.module.pixie" description="Build &#39;Pixie&#39; artifact">
+    <property name="artifact.temp.output.pixie" value="${artifacts.temp.dir}/Pixie"/>
+    <mkdir dir="${artifact.temp.output.pixie}"/>
+    <jar destfile="${temp.jar.path.Pixie.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset file="${basedir}/META-INF/MANIFEST.MF" prefix="META-INF"/>
+      <zipfileset src="${basedir}/../../../../03_Libs/opencv/opencv-320.jar"/>
+      <zipfileset src="${basedir}/../../../../03_Libs/Logger/slf4j/slf4j-api-1.7.25.jar"/>
+      <zipfileset src="${basedir}/../../../../03_Libs/Logger/logback/logback-core-1.2.2.jar"/>
+      <zipfileset src="${basedir}/../../../../03_Libs/Logger/logback/logback-classic-1.2.2.jar"/>
+      <zipfileset src="${basedir}/../../../../03_Libs/JSON/json-simple-1.1.1.jar"/>
+      <zipfileset src="${basedir}/../../../../03_Libs/jpen_2/jpen-2.jar"/>
+      <zipfileset src="${basedir}/../../../../03_Libs/Jocl/jocl-2.0.0.jar"/>
+      <zipfileset src="${basedir}/../../../../03_Libs/JCuda/lib64/jcuda-0.8.0.jar"/>
+      <zipfileset src="${basedir}/../../../../03_Libs/JCuda/lib64/jcuda-natives-0.8.0-linux-x86_64.jar"/>
+      <zipfileset src="${basedir}/../../../../03_Libs/JCuda/lib64/jcuda-natives-0.8.0-windows-x86_64.jar"/>
+      <zipfileset dir="${pixie.output.dir}"/>
+      <zipfileset src="${basedir}/../../../../03_Libs/InternalLibs/Communication/bin/Communication.jar"/>
+      <zipfileset src="${basedir}/../../../../03_Libs/InternalLibs/PixelSegmentation/bin/PixelSegmentation.jar"/>
+      <zipfileset src="${basedir}/../../../../03_Libs/InternalLibs/Video/bin/Video.jar"/>
+    </jar>
+    <copy file="${temp.jar.path.Pixie.jar}" tofile="${artifact.temp.output.pixie}/Pixie.jar"/>
+  </target>
+  
+  <target name="build.all.artifacts" depends="artifact.pixie" description="Build all artifacts">
+    <mkdir dir="${artifact.output.pixie}"/>
+    <copy todir="${artifact.output.pixie}">
+      <fileset dir="${artifact.temp.output.pixie}"/>
+    </copy>
+    
+    <!-- Delete temporary files -->
+    <delete dir="${artifacts.temp.dir}"/>
+  </target>
+  
+  <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
+</project>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="libs/InternalLibs/PixelSegmentation/bin/PixelSegmentation.jar"/>
+	<classpathentry kind="lib" path="libs/Logger/slf4j/slf4j-api-1.7.25.jar"/>
+	<classpathentry kind="lib" path="libs/Logger/logback/logback-classic-1.2.2.jar"/>
+	<classpathentry kind="lib" path="libs/Logger/logback/logback-core-1.2.2.jar"/>
+	<classpathentry kind="lib" path="libs/jpen_2/jpen-2.jar"/>
+	<classpathentry kind="lib" path="libs/JSON/json-simple-1.1.1.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

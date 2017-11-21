@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="jpen_2">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../../../../03_Libs/jpen_2" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../../../../03_Libs/jpen_2/jpen-2-150301-javadoc.zip!/jpen-2-150301" />
+    </JAVADOC>
+    <NATIVE>
+      <root url="file://$PROJECT_DIR$/../../../../03_Libs/jpen_2" />
+    </NATIVE>
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../../../../03_Libs/jpen_2" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../03_Libs/jpen_2" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../03_Libs/jpen_2" recursive="false" type="SOURCES" />
+  </library>
+</component>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_pixie" default="compile.module.pixie">
+  <dirname property="module.pixie.basedir" file="${ant.file.module_pixie}"/>
+  
+  <property name="module.jdk.home.pixie" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.pixie" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.pixie" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.pixie" value="-encoding UTF-8 -source 9 -target 9 ${compiler.args}"/>
+  
+  <property name="pixie.output.dir" value="${module.pixie.basedir}/out/production/Pixie"/>
+  <property name="pixie.testoutput.dir" value="${module.pixie.basedir}/out/test/Pixie"/>
+  
+  <path id="pixie.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="pixie.module.production.classpath">
+    <path refid="${module.jdk.classpath.pixie}"/>
+    <path refid="library.slf4j.classpath"/>
+    <path refid="library.logback.classpath"/>
+    <path refid="library.communication.classpath"/>
+    <path refid="library.pixelsegmentation.classpath"/>
+    <path refid="library.video.classpath"/>
+    <path refid="library.opencv.classpath"/>
+    <path refid="library.jpen_2.classpath"/>
+    <path refid="library.json.classpath"/>
+    <path refid="library.jocl.classpath"/>
+    <path refid="library.junit.classpath"/>
+  </path>
+  
+  <path id="pixie.runtime.production.module.classpath">
+    <pathelement location="${pixie.output.dir}"/>
+    <path refid="library.slf4j.classpath"/>
+    <path refid="library.logback.classpath"/>
+    <path refid="library.communication.classpath"/>
+    <path refid="library.pixelsegmentation.classpath"/>
+    <path refid="library.video.classpath"/>
+    <path refid="library.opencv.classpath"/>
+    <path refid="library.jpen_2.classpath"/>
+    <path refid="library.json.classpath"/>
+    <path refid="library.jocl.classpath"/>
+    <path refid="library.junit.classpath"/>
+  </path>
+  
+  <path id="pixie.module.classpath">
+    <path refid="${module.jdk.classpath.pixie}"/>
+    <pathelement location="${pixie.output.dir}"/>
+    <path refid="library.slf4j.classpath"/>
+    <path refid="library.logback.classpath"/>
+    <path refid="library.communication.classpath"/>
+    <path refid="library.pixelsegmentation.classpath"/>
+    <path refid="library.video.classpath"/>
+    <path refid="library.opencv.classpath"/>
+    <path refid="library.jpen_2.classpath"/>
+    <path refid="library.json.classpath"/>
+    <path refid="library.jocl.classpath"/>
+    <path refid="library.junit.classpath"/>
+  </path>
+  
+  <path id="pixie.runtime.module.classpath">
+    <pathelement location="${pixie.testoutput.dir}"/>
+    <pathelement location="${pixie.output.dir}"/>
+    <path refid="library.slf4j.classpath"/>
+    <path refid="library.logback.classpath"/>
+    <path refid="library.communication.classpath"/>
+    <path refid="library.pixelsegmentation.classpath"/>
+    <path refid="library.video.classpath"/>
+    <path refid="library.opencv.classpath"/>
+    <path refid="library.jpen_2.classpath"/>
+    <path refid="library.json.classpath"/>
+    <path refid="library.jocl.classpath"/>
+    <path refid="library.junit.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.pixie">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.pixie">
+    <patternset refid="excluded.from.module.pixie"/>
+  </patternset>
+  
+  <path id="pixie.module.sourcepath">
+    <dirset dir="${module.pixie.basedir}/../../../../02_SourceCode/java">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  <path id="pixie.module.test.sourcepath">
+    <dirset dir="${module.pixie.basedir}/../../../../../04_Test/04_Java">
+      <include name="JUnit"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.pixie" depends="compile.module.pixie.production,compile.module.pixie.tests" description="Compile module Pixie"/>
+  
+  <target name="compile.module.pixie.production" depends="register.custom.compilers" description="Compile module Pixie; production classes">
+    <mkdir dir="${pixie.output.dir}"/>
+    <javac2 destdir="${pixie.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.pixie}/javac">
+      <compilerarg line="${compiler.args.pixie}"/>
+      <bootclasspath refid="pixie.module.bootclasspath"/>
+      <classpath refid="pixie.module.production.classpath"/>
+      <src refid="pixie.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.pixie"/>
+    </javac2>
+    
+    <copy todir="${pixie.output.dir}">
+      <fileset dir="${module.pixie.basedir}/../../../../02_SourceCode/java/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.pixie.tests" depends="register.custom.compilers,compile.module.pixie.production" description="compile module Pixie; test classes" unless="skip.tests">
+    <mkdir dir="${pixie.testoutput.dir}"/>
+    <javac2 destdir="${pixie.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.pixie}/javac">
+      <compilerarg line="${compiler.args.pixie}"/>
+      <bootclasspath refid="pixie.module.bootclasspath"/>
+      <classpath refid="pixie.module.classpath"/>
+      <src refid="pixie.module.test.sourcepath"/>
+      <patternset refid="excluded.from.compilation.pixie"/>
+    </javac2>
+    
+    <copy todir="${pixie.testoutput.dir}">
+      <fileset dir="${module.pixie.basedir}/../../../../../04_Test/04_Java/JUnit">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="clean.module.pixie" description="cleanup module">
+    <delete dir="${pixie.output.dir}"/>
+    <delete dir="${pixie.testoutput.dir}"/>
+  </target>
+</project>

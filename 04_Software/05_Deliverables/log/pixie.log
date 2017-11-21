@@ -1,0 +1,28 @@
+2017-11-21 17:53:24,842 ERROR  [AWT-EventQueue-0]   common.UserPreferences                             [UserPreferences.java:256]     The user preferences file was not loaded! Will load default values!!
+2017-11-21 17:55:18,178 ERROR  [AWT-EventQueue-0]   common.UserPreferences                             [UserPreferences.java:256]     The user preferences file was not loaded! Will load default values!!
+2017-11-21 17:57:10,731 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:10,740 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:11,805 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:11,806 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:12,030 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:12,031 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:12,298 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:12,299 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:12,699 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:12,700 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:12,958 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:12,959 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:13,384 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:13,385 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:13,593 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:13,594 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:13,852 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:13,853 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:14,164 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:14,165 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:14,367 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:14,368 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:14,572 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:14,573 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:14,750 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.
+2017-11-21 17:57:14,751 WARN   [AWT-EventQueue-0]   parallelcomputing.jcuda.JCudaUtils                 [JCudaUtils.java:144]          There are no Cuda devices available or the Cuda SDK is not installed.

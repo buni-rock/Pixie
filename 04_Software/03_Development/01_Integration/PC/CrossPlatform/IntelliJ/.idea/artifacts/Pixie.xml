@@ -1,0 +1,17 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="Pixie">
+    <output-path>$PROJECT_DIR$/../../../../../05_Deliverables/bin</output-path>
+    <root id="archive" name="Pixie.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../03_Libs/Logger/slf4j/slf4j-api-1.7.25.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../03_Libs/Logger/logback/logback-core-1.2.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../03_Libs/Logger/logback/logback-classic-1.2.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../03_Libs/JSON/json-simple-1.1.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../03_Libs/jpen_2/jpen-2.jar" path-in-jar="/" />
+      <element id="module-output" name="Pixie" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../03_Libs/InternalLibs/PixelSegmentation/bin/PixelSegmentation.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

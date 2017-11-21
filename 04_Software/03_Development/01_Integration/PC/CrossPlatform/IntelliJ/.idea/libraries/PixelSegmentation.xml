@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="PixelSegmentation">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../../../../03_Libs/InternalLibs/PixelSegmentation/bin" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="file://$PROJECT_DIR$/../../../../03_Libs/InternalLibs/PixelSegmentation/javadoc" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../../../../03_Libs/InternalLibs/PixelSegmentation/sources" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../03_Libs/InternalLibs/PixelSegmentation/bin" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../03_Libs/InternalLibs/PixelSegmentation/sources" recursive="false" type="SOURCES" />
+  </library>
+</component>

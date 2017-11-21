@@ -1,0 +1,26 @@
+<configuration>
+
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>./../log/PixelSegmentation.log</file>
+    <encoder>
+      <pattern>%-30(%date %level) %-20([%thread]) %-50(%logger{50}) %-30([%file:%line]) %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%-30(%date %highlight(%-5level)) [%blue(%-20(%thread))] %boldMagenta(%-50(%logger{50})) %boldBlue(%-30([%file:%line])) %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- Set logger level per class -->
+<!--   <logger name="video.Video" level="ERROR" />
+  <logger name="frameGrabber.FrameGrabberAvi" level="DEBUG" /> -->
+
+  <!-- Logger levels: TRACE < DEBUG < INFO <  WARN < ERROR.  -->
+  <!-- Set global logger level -->
+  <root level="debug">
+    <appender-ref ref="FILE" />
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>
