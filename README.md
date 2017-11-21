@@ -5,6 +5,9 @@ Pixie is an image(s) labeling/annotation application which allows the user to la
 - Polygon
 - Free hand drawing
 - Semantic segmentation
+- Scene/Frame annotation
+
+Before using Pixie, we highly recomand to read the [user manual](https://github.com/buni-rock/Pixie/wiki/User-Manual). Alternatively the user manual can be found in Pixie's deliverables.
 
 As it is very well known, an image is worth a thousound words, so here there are some output images labeled using Pixie
 
@@ -25,7 +28,7 @@ As it is very well known, an image is worth a thousound words, so here there are
 ![](https://github.com/buni-rock/Pixie/blob/master/demo/BeforeAfter_flowers.PNG)
 
 #### Semantic segmentation video file
-![Watch the video](http://ib-be.de/img/Highway.mp4)
+[Watch the video](https://annotate.zone/img/Highway.mp4)
 
 ## Features List
 To be updated
