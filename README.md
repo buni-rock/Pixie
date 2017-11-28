@@ -20,7 +20,7 @@ As it is very well known, an image is worth a thousound words, so here there are
 #### Semantic segmentation:
 ![](https://github.com/buni-rock/Pixie/blob/master/demo/Animals1.png)
 ![](https://github.com/buni-rock/Pixie/blob/master/demo/Pedestrians3.jpg)
-![](https://github.com/buni-rock/Pixie/blob/master/demo/Pedestrians.jpg)
+![](https://github.com/buni-rock/Pixie/blob/master/demo/Pedestrians.png)
 
 #### Before and after image compilations; they are shown only as demonstrator
 ![](https://github.com/buni-rock/Pixie/blob/master/demo/BeforeAfter_Animals.jpg)
