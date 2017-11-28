@@ -5,7 +5,7 @@
     <Menu class="javax.swing.JMenuBar" name="jMBBBoxWindow">
       <SubComponents>
         <Menu class="javax.swing.JMenu" name="jMFile">
-  <Properties>
+          <Properties>
             <Property name="text" type="java.lang.String" value="File"/>
           </Properties>
           <SubComponents>
