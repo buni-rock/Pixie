@@ -25,6 +25,7 @@
  */
 package gui.support;
 
+import common.ConstantsLabeling;
 import library.Resize;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -82,13 +83,7 @@ public class ObjectPolygon extends Objects {
 
     @Override
     public void move(int xOffset, int yOffset, Rectangle coordPanelBox, Resize resizeRate, Dimension frameSize) {
-        for (int index = 0; index < polygon.npoints; index++) {
-            Point vertex = new Point(polygon.xpoints[index], polygon.ypoints[index]);
-            movePoint(xOffset, yOffset, vertex);
-        }
-
-        // move the outer bounding box
-        movePoint(xOffset, yOffset, outerBBox.getLocation());
+        move(xOffset, yOffset, frameSize);
     }
 
     @Override
@@ -99,7 +94,7 @@ public class ObjectPolygon extends Objects {
 
     @Override
     public void changeSize(int left, int top, int right, int bottom, Rectangle coordPanelBox, Resize resizeRate, Dimension frameSize) {
-        // to be implemented
+         // in order to change the size of the polygon, an edit window has to be opened; no other changes can be done in the GUI
     }
 
     @Override
@@ -140,4 +135,27 @@ public class ObjectPolygon extends Objects {
         this.polygon = polygon;
     }
 
+	@Override
+    public void move(int xOffset, int yOffset, Dimension frameSize) {
+        for (int index = 0; index < polygon.npoints; index++) {
+            Point vertex = new Point(polygon.xpoints[index], polygon.ypoints[index]);
+
+            boolean moveValid = ((vertex.x + xOffset >= 0)
+                    && (vertex.y + yOffset >= 0)
+                    && (vertex.x + xOffset <= frameSize.width)
+                    && (vertex.y + yOffset <= frameSize.height));
+
+            if (moveValid) {
+                movePoint(xOffset, yOffset, vertex);
+                polygon.xpoints[index] = vertex.x;
+                polygon.ypoints[index] = vertex.y;
+            }
+        }
+
+        // recompute the outer bounding box
+        computeOuterBBoxCurObj();
+
+        // if the label was changed, it means that the user touched it, therefore the segmentation is manual
+        segmentationSource = ConstantsLabeling.LABEL_SOURCE_MANUAL;
+    }
 }

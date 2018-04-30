@@ -38,6 +38,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -1502,5 +1503,113 @@ public class Utils {
         }
 
         return clonedTree;
+    }
+
+    /**
+     * Check if a string is numeric.
+     *
+     * @param str the string to be checked
+     * @return true if the string contains just number specific characters:
+     * 0...9 , -
+     */
+    public static boolean isNumeric(String str) {
+        return str.matches("-?\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
+    }
+
+    /**
+     * Compute the distance from the point P to the line defined by the points A
+     * and B.
+     *
+     * https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
+     *
+     * @param a the point A of the line
+     * @param b the point B of the line
+     * @param p the point from where the distance is computed
+     * @return
+     */
+    public static float distPointToLine(Point a, Point b, Point p) {
+        float nominator = (b.y - a.y) * p.x - (b.x - a.x) * p.y + b.x * a.y - b.y * a.x;
+        float denominator = (b.y - a.y) * (b.y - a.y) + (b.x - a.x) * (b.x - a.x);
+
+        return (float) (Math.abs(nominator) / Math.sqrt(denominator));
+
+    }
+
+    /**
+     * In analytic geometry, the distance between two points of the xy-plane can
+     * be found using the distance formula. The distance between (x1, y1) and
+     * (x2, y2) is given by:
+     *
+     * d = sqrt((Δx)^2 + (Δy)^2) = sqrt((x2 − x1)^2 + (y2 − y1)^2)
+     *
+     * @param a the point A of the segment
+     * @param b the point B of the segment
+     * @return The length of the segment formed by the two points, A and B.
+     */
+    public static float distPointToPoint(Point a, Point b) {
+        return (float) Math.sqrt((b.y - a.y) * (b.y - a.y) + (b.x - a.x) * (b.x - a.x));
+    }
+
+    /**
+     *
+     * @param a the point A of the triangle
+     * @param b the point B of the triangle
+     * @param v the point V of the triangle
+     * @return
+     */
+    public static float distPointToSegment(Point a, Point b, Point v) {
+        float distVA = distPointToPoint(a, v);
+        float distVB = distPointToPoint(b, v);
+        float distAB = distPointToPoint(a, b);
+
+        return ((distVA + distVB) / distAB);
+
+    }
+
+    /**
+     * Create a deep copy of the polygon.
+     *
+     * @param poly the polygon to be replicated
+     * @return a new polygon, copy of the initial one
+     */
+    public static Polygon deepCopyPoly(Polygon poly) {
+        return new Polygon(poly.xpoints, poly.ypoints, poly.npoints);
+    }
+
+    /**
+     * Open and decode a binary greyscale image. The file shall contain just the
+     * bytes of the image.
+     *
+     * @param chosenFileName the name of the file to be opened
+     * @param width the width of the image
+     * @param height the height of the image
+     * @return the image from the specified file
+     */
+    public static BufferedImage getBinaryByteImage(String chosenFileName, int width, int height) {
+        int value, x, y, pos = 0;
+        // create the image
+        BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+
+        try (DataInputStream in = new DataInputStream(new FileInputStream(chosenFileName))) {
+            while (in.available() > 0) {
+                // read the image byte by byte
+                value = in.readByte();
+                
+                // the data is uint8
+                if (value < 0) {
+                    value += 255;
+                }
+                // compute the position in the image
+                y = pos / width;
+                x = pos % width;
+                bi.setRGB(x, y, new Color(value, value, value).getRGB());
+                
+                pos++;
+            }
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return bi;
     }
 }

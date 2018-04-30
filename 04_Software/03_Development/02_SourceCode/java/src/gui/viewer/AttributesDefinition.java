@@ -1008,7 +1008,7 @@ public class AttributesDefinition extends javax.swing.JDialog implements Observe
      * a string.
      * @return the string representing the frame attributes, separated by comma
      */
-    private String getFrameAttributes(List<Object> attributesList) {
+    private static String getFrameAttributes(List<Object> attributesList) {
         StringBuilder frameAttrib = new StringBuilder();
         for (Object attribute : attributesList) {
             frameAttrib.append(attribute);

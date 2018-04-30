@@ -526,6 +526,21 @@ public abstract class Objects {
         this.outerBBox = outerBBox;
     }
 
+	/**
+     * Moves one box with the specified offset and returns the new image
+     * coordinates.
+     *
+     * @param xOffset - how much should the object move on the X axis
+     * @param yOffset - how much the object should move on the Y axis
+     * @param boxPosOrig - the position of the selected box in image coordinates
+     * @return - the new image coordinates of the box
+     */
+    protected Rectangle moveBox(int xOffset, int yOffset, Rectangle boxPosOrig) {
+        boxPosOrig.setLocation(boxPosOrig.x + xOffset, boxPosOrig.y + yOffset);
+
+        return boxPosOrig;
+    }
+	
     /**
      * Compute the position and size of the outer bounding box containing the
      * crops of the object.
@@ -544,6 +559,16 @@ public abstract class Objects {
      */
     public abstract void move(int xOffset, int yOffset, Rectangle coordPanelBox, Resize resizeRate, Dimension frameSize);
 
+	/**
+     * Moves the object completely in the specified direction (crops, scribbles,
+     * outer box etc.).
+     *
+     * @param xOffset - how much should the object move on the X axis
+     * @param yOffset - how much the object should move on the Y axis
+     * @param frameSize the size of the original image
+     */
+    public abstract void move(int xOffset, int yOffset, Dimension frameSize);
+	
     /**
      * Delete the selected box. The method checkd if the box is the same as the
      * whole object. If it is true, it will not delete it. The parent function

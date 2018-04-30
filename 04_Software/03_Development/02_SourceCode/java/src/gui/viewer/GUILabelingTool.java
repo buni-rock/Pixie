@@ -2728,11 +2728,6 @@ public class GUILabelingTool extends javax.swing.JFrame implements Observer {
 
             // run the matting algorithm if there are scribble objects
             gc.runMattingForObjList();
-
-            // pop up the objects if the user wants it
-            if (action == Constants.NEXT_FRAME) {
-                gc.popUpObjects();
-            }
         }
     }
 

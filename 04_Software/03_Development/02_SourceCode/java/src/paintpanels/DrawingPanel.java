@@ -43,6 +43,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -199,9 +201,17 @@ public final class DrawingPanel extends JPanel {
     private Color objColor;
 
     /**
-     * The current polygon being segmented.
+     * The current polygon being segmented  - panel coordinates.
      */
     private Polygon currentPolygon;
+	
+	/**
+     * The current polygon being segmented - original coordinates. The double
+     * data is kept in order to have a synchronization between the edit mode and
+     * the GUI. The object on the GUI is updated automatically when the orignal
+     * poly is modified on the drawing side.
+     */
+    private Polygon originalPolygon;
 
     /**
      * The list of polygon objects segmented, to be displayed.
@@ -224,6 +234,16 @@ public final class DrawingPanel extends JPanel {
      */
     private final transient Logger log = LoggerFactory.getLogger(DrawingPanel.class);
 
+	/**
+     * A vertex which was selected by the user.
+     */
+    private int selectedPolyIndex;
+
+    /**
+     * True if a point/points should be highlighted.
+     */
+    private boolean highlightPoints;
+	
     /**
      * Load image when the image is given (used for crop).
      *
@@ -249,6 +269,29 @@ public final class DrawingPanel extends JPanel {
         initPanel();
     }
 
+	/**
+     * Load image, with a user defined zoom, when the image is given (used for
+     * edit mode).
+     *
+     * @param image - the image to be displayed
+     * @param drawType - the current type of drawing for panel
+     * @param userZoomedIndex user's prefer zoomed index
+     */
+    public DrawingPanel(BufferedImage image, DrawConstants.DrawType drawType, int userZoomedIndex) {
+        this.origImg = image;
+        this.drawType = drawType;
+
+        resize = new Resize(origImg.getWidth(), origImg.getHeight(), userZoomedIndex);
+
+        workImg = resize.resizeImage(origImg);
+
+        this.panelSize = new Dimension(workImg.getWidth(), workImg.getHeight());
+
+        log.info("**resized image {}x{}", workImg.getWidth(), workImg.getHeight());
+
+        initPanel();
+    }
+	
     /**
      * Configure the basic characteristics of the panel.
      */
@@ -259,10 +302,7 @@ public final class DrawingPanel extends JPanel {
         //characteristics of the panel
         this.setFocusable(true);
 
-        this.setPreferredSize(panelSize);
-        this.setSize(panelSize);
-        this.setMinimumSize(panelSize);
-        this.setMaximumSize(panelSize);
+        setPanelFixedSize();
 
         this.repaint();
         this.setVisible(true);
@@ -292,6 +332,10 @@ public final class DrawingPanel extends JPanel {
 
         // set the id as invalid
         idSelectedBox = -1;
+	resetPolygonIndex();
+
+        // highlight points if any selected
+        this.highlightPoints = true;
     }
 
     /**
@@ -327,6 +371,14 @@ public final class DrawingPanel extends JPanel {
                 mousePosition.setLocation(e.getX(), e.getY());
             }
 
+        });
+        
+	addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                // highlight points if any selected
+                highlightPoints = false;
+            }
         });
     }
 
@@ -382,6 +434,35 @@ public final class DrawingPanel extends JPanel {
                 drawGuideShape = true;
                 break;
 
+            case EDIT_POLYGON_VERTICES:
+                switch (actionType) {
+                    // edit vertex option
+                    case ConstantsLabeling.ACTION_TYPE_BACKGROUND:
+                        getClosestPolyPoint();
+                        break;
+
+                    case ConstantsLabeling.ACTION_TYPE_OBJECT:
+                        // add vertex option
+                        getClosestPolyLine();
+                        splitPolyLine();
+                        break;
+
+                    case ConstantsLabeling.ACTION_TYPE_ERASE:
+                        // remove vertex option
+                        // on left click select a vertex
+                        getClosestPolyPoint();
+
+                        // on right click remove the vertex
+                        if (SwingUtilities.isRightMouseButton(e)) {
+                            // Right-click happened
+                            removeSelectedPolyPoint();
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+                break;
             default:
                 break;
         }
@@ -424,6 +505,9 @@ public final class DrawingPanel extends JPanel {
                 }
                 break;
 
+		case EDIT_POLYGON_VERTICES:
+                    observable.notifyObservers(ObservedActions.Action.UPDATE_POLYGON_VERTICES);
+                break;
             default:
                 break;
         }
@@ -454,6 +538,24 @@ public final class DrawingPanel extends JPanel {
         // save coord x,y when mouse is dragged
         currentMouse.setLocation(e.getPoint());
 
+                // implement the actions for mouse dragged and draw scribbles option
+        draggDrawScribble();
+
+        // implement the actions for mouse dragged and edit polygon
+        draggPolyPoint();
+
+        // if an object is selected and dragged, notify to move it
+        if ((idSelectedBox > -1) && !drawGuideShape) {
+            observable.notifyObservers(ObservedActions.Action.MOVE_OBJECT_DRAG);
+        }
+    }
+
+    /**
+     * Implement the functionality of the draw scribbles when the mouse is
+     * dragged; draw or erase scribbles. If an object is chosen (background or
+     * object), draw scribbles; else remove the selected scribbles.
+     */
+    private void draggDrawScribble() {
         // depending on the action, draw scribble or erase them
         if (drawType == DrawConstants.DrawType.DRAW_SCRIBBLE) {
             if (actionType > ConstantsLabeling.ACTION_TYPE_ERASE) {
@@ -464,10 +566,23 @@ public final class DrawingPanel extends JPanel {
 
             oldMouse.setLocation(currentMouse.getLocation());
         }
+    }
 
-        // if an object is selected and dragged, notify to move it
-        if ((idSelectedBox > -1) && !drawGuideShape) {
-            observable.notifyObservers(ObservedActions.Action.MOVE_OBJECT_DRAG);
+    /**
+     * Edit the polygon points: allow the user to drag the points of the poly to the wanted position.
+     */
+    private void draggPolyPoint() {
+        if (drawType == DrawConstants.DrawType.EDIT_POLYGON_VERTICES) {
+
+            if ((ConstantsLabeling.ACTION_TYPE_BACKGROUND == actionType)
+                    || (ConstantsLabeling.ACTION_TYPE_OBJECT == actionType)) {
+                if ((-1 == selectedPolyIndex) || (0 == currentPolygon.npoints)) {
+                    return;
+                }
+                // move the selected point with the mouse
+                currentPolygon.xpoints[selectedPolyIndex] = currentMouse.x;
+                currentPolygon.ypoints[selectedPolyIndex] = currentMouse.y;
+            }
         }
     }
 
@@ -493,6 +608,9 @@ public final class DrawingPanel extends JPanel {
 
         // highlight the selected object
         highlightSelectedBox(g2D);
+		
+	// highlight the selected point of the polygon
+        highlightPoint(g2D, selectedPolyIndex);									   
     }
 
     private void highlightSelectedBox(Graphics2D g2D) {
@@ -707,6 +825,10 @@ public final class DrawingPanel extends JPanel {
 
                 DrawOptions.drawPolygon(g2D, currentPolygon, Color.red, false);
                 break;
+				
+            case EDIT_POLYGON_VERTICES:
+                DrawOptions.drawPolygon(g2D, currentPolygon, objColor, false);
+                break;
 
             case DRAW_SCRIBBLE:
                 drawScribble(g2D);
@@ -820,7 +942,7 @@ public final class DrawingPanel extends JPanel {
      * Refresh the displayed image, considering the maximum available space on
      * the gui.
      *
-     * @param image             the image to be displayed
+     * @param image the image to be displayed
      * @param availableDrawSize the amount of space available on the gui for drawing the image
      */
     public void refreshImage(BufferedImage image, Dimension availableDrawSize) {
@@ -834,7 +956,7 @@ public final class DrawingPanel extends JPanel {
     /**
      * Change the frame with another one.
      *
-     * @param image             the new image to be displayed
+     * @param image the new image to be displayed
      * @param availableDrawSize the amount of space available on the gui for drawing the image
      */
     public void newFrame(BufferedImage image, Dimension availableDrawSize) {
@@ -862,10 +984,7 @@ public final class DrawingPanel extends JPanel {
         // recompute the size of the panel, according to the new image size
         this.panelSize = PanelResolution.computeOptimalPanelSize(new Dimension(imgSize.width, imgSize.height), availableDrawSize);
 
-        this.setPreferredSize(panelSize);
-        this.setSize(panelSize);
-        this.setMinimumSize(panelSize);
-        this.setMaximumSize(panelSize);
+        setPanelFixedSize();
 
         // compute the resize based on the new image size and the updated panel size
         double ratioWidth = (double) imgSize.width / (double) panelSize.width;
@@ -880,7 +999,7 @@ public final class DrawingPanel extends JPanel {
      *
      * @param image the original image (in original size)
      */
-    private void updateImage(BufferedImage image) {
+    public void updateImage(BufferedImage image) {
         // update the image
         this.origImg = image;
 
@@ -893,6 +1012,10 @@ public final class DrawingPanel extends JPanel {
             workImg = new BufferedImage(origImg.getWidth(), origImg.getHeight(), origImg.getType());
             Utils.copySrcIntoDstAt(origImg, workImg);
         }
+		
+	panelSize.width = workImg.getWidth();
+        panelSize.height = workImg.getHeight();
+        setPanelFixedSize();
     }
 
     /**
@@ -924,6 +1047,16 @@ public final class DrawingPanel extends JPanel {
      */
     public DrawConstants.DrawType getDrawType() {
         return drawType;
+    }
+	
+	/**
+     * Allow the highlight of points; the points of a polygon for example.
+     *
+     * @param highlightPoints true if the selected point/points should be
+     * highlighted
+     */
+    public void setHighlightPoints(boolean highlightPoints) {
+        this.highlightPoints = highlightPoints;
     }
 
     /**
@@ -1323,6 +1456,17 @@ public final class DrawingPanel extends JPanel {
     public void initCurrentPolygon() {
         this.currentPolygon = new Polygon();
     }
+	
+    /**
+     * Set the current polygon with the specified one.
+     *
+     * @param poly the polygon which should be considered the current one
+     * @param originalPoly the original polygon, which should not be resized
+     */
+    public void setCurrentPolygon(Polygon poly, Polygon originalPoly) {
+        this.currentPolygon = resize.originalToResized(poly);
+        this.originalPolygon = originalPoly;
+    }
 
     /**
      * Reset the current drawn polygon.
@@ -1385,4 +1529,168 @@ public final class DrawingPanel extends JPanel {
         this.objAlpha = objAlpha;
     }
 
+    /**
+     * Find the closest polygon point to the place where the user clicked.
+     */
+    private void getClosestPolyPoint() {
+        // if a point is selected, do not compute the distances anymore
+        if ((currentPolygon == null) || (0 == currentPolygon.npoints)) {
+            return;
+        }
+
+        float minDist = Float.MAX_VALUE;
+        int closestPointIndex = -1;
+
+        for (int index = 0; index < currentPolygon.npoints; index++) {
+            /// compute the distance between the points
+            float distance = (float) Math.sqrt((currentMouse.x - currentPolygon.xpoints[index]) * (currentMouse.x - currentPolygon.xpoints[index])
+                    + (double) (currentMouse.y - currentPolygon.ypoints[index]) * (currentMouse.y - currentPolygon.ypoints[index]));
+            // if the distance is smaller, take the new point as closer
+            if (distance < minDist) {
+                minDist = distance;
+                closestPointIndex = index;
+            }
+        }
+
+        selectedPolyIndex = closestPointIndex;
+
+        // highlight points if any selected
+        highlightPoints = true;
+    }
+
+    /**
+     * Find the closest polygon point to the place where the user clicked.
+     */
+    private void getClosestPolyLine() {
+        // if a point is selected, do not compute the distances anymore
+        if ((currentPolygon == null) || (0 == currentPolygon.npoints)) {
+            return;
+        }
+
+        float minDist = Float.MAX_VALUE;
+        int closestPointIndex = -1;
+
+        for (int index = 1; index < currentPolygon.npoints; index++) {
+            /// compute the distance between the points
+            Point a = new Point(currentPolygon.xpoints[index - 1], currentPolygon.ypoints[index - 1]);
+            Point b = new Point(currentPolygon.xpoints[index], currentPolygon.ypoints[index]);
+            float distance = Utils.distPointToSegment(a, b, currentMouse);
+
+            // if the distance is smaller, take the new point as closer
+            if (distance < minDist) {
+                minDist = distance;
+                closestPointIndex = index;
+            }
+
+            System.out.println("dist = " + distance);
+        }
+
+        Point a = new Point(currentPolygon.xpoints[currentPolygon.npoints - 1], currentPolygon.ypoints[currentPolygon.npoints - 1]);
+        Point b = new Point(currentPolygon.xpoints[0], currentPolygon.ypoints[0]);
+        float distance = Utils.distPointToSegment(a, b, currentMouse);
+        // if the distance is smaller, take the new point as closer
+        if (distance < minDist) {
+            minDist = distance;
+            closestPointIndex = 0;
+        }
+        System.out.println("dist = " + distance);
+
+        System.out.println("MIN dist: " + minDist + "  closestPointIndex: " + closestPointIndex);
+        selectedPolyIndex = closestPointIndex;
+
+        // highlight points if any selected
+        highlightPoints = true;
+    }
+
+    /**
+     * Highlight a specified point.
+     *
+     * @param g2d the graphics component
+     * @param selectedPoint the point to be highlighted
+     */
+    private void highlightPoint(Graphics2D g2d, int selectedPointIndex) {
+        if ((selectedPointIndex >= 0) && highlightPoints) {
+            g2d.setColor(new Color(0, 0, 0, 200));
+            // if there is a selected box, draw it transparent
+            g2d.fillOval(currentPolygon.xpoints[selectedPointIndex] - 5, currentPolygon.ypoints[selectedPointIndex] - 5, 10, 10);
+        }
+    }
+
+    /**
+     * Set the panel size. Do not allow the panel to be resized.
+     */
+    private void setPanelFixedSize() {
+        this.setPreferredSize(panelSize);
+        this.setSize(panelSize);
+        this.setMinimumSize(panelSize);
+        this.setMaximumSize(panelSize);
+    }
+
+    /**
+     * Remove the selected point from the polygon. If the point is found, shift
+     * all the points to the left with one position (overwrite the current
+     * point).
+     */
+    private void removeSelectedPolyPoint() {
+        if ((-1 == selectedPolyIndex) || (0 == currentPolygon.npoints)
+                || (selectedPolyIndex > currentPolygon.npoints - 1)) {
+            return;
+        }
+
+        // shift the points to the left, in order to overwrite the unwanted point
+        for (int pos = selectedPolyIndex; pos < currentPolygon.npoints - 1; pos++) {
+            // remove the matching point by shifting the rest of the points to the left
+            currentPolygon.xpoints[pos] = currentPolygon.xpoints[pos + 1];
+            currentPolygon.ypoints[pos] = currentPolygon.ypoints[pos + 1];
+        }
+
+        // decrease the number of points with one
+        currentPolygon.npoints -= 1;
+
+        // do not show the point because it does not exist
+        highlightPoints = false;
+    }
+
+    /**
+     * Reset the polygon index because the old one is no longer valid.
+     */
+    public void resetPolygonIndex() {
+        selectedPolyIndex = -1;
+    }
+
+    /**
+     * Insert a new point in the polygon, represented by the current mouse
+     * coordinates, at the position specified by selectedPolyIndex.
+     */
+    private void splitPolyLine() {
+        if (-1 == selectedPolyIndex) {
+            return;
+        }
+        Polygon poly = new Polygon();
+
+        int index;
+        if (0 == selectedPolyIndex) {
+            poly.addPoint(currentMouse.x, currentMouse.y);
+        }
+
+        for (index = 0; index < selectedPolyIndex; index++) {
+            poly.addPoint(currentPolygon.xpoints[index], currentPolygon.ypoints[index]);
+        }
+        if (0 != selectedPolyIndex) {
+            poly.addPoint(currentMouse.x, currentMouse.y);
+        }
+
+        for (index = selectedPolyIndex; index < currentPolygon.npoints; index++) {
+            poly.addPoint(currentPolygon.xpoints[index], currentPolygon.ypoints[index]);
+        }
+
+        currentPolygon = poly;
+        observable.notifyObservers(ObservedActions.Action.UPDATE_POLYGON_VERTICES);
+    }
+
+    public void updateScribbleList() {
+        for (ScribbleInfo pi : scribbleList) {
+            pi.setPanelPos(resize.originalToResized(pi.getImgPos()));
+        }
+    }
 }

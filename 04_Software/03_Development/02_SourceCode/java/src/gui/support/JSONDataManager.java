@@ -180,6 +180,17 @@ public class JSONDataManager {
 
             // save the polygon points in a file
             savePolygonMap(objectMapPath, ((ObjectPolygon) object).getPolygon());
+
+            String xCoords = "", yCoords = "";
+            // save data in plain in the json file
+            Polygon poly = ((ObjectPolygon) object).getPolygon();
+            for (int idx = 0; idx < poly.npoints; idx++) {
+                xCoords += poly.xpoints[idx] + " ";
+                yCoords += poly.ypoints[idx] + " ";
+            }
+
+            jsonObject.put("xCoordinates", xCoords.toLowerCase(Locale.ENGLISH));
+            jsonObject.put("yCoordinates", yCoords.toLowerCase(Locale.ENGLISH));
         }
 
         // add the object to the object array list
@@ -475,7 +486,7 @@ public class JSONDataManager {
      * @param obj - the object to check if it exists in the list
      * @return - true if the object exists and false otherwise
      */
-    private boolean isObjInObjList(Objects obj, List<Objects> objectList) {
+    private static boolean isObjInObjList(Objects obj, List<Objects> objectList) {
         return objectList.stream().anyMatch(object -> (object.getObjectId() == obj.getObjectId()));
     }
 
@@ -485,7 +496,7 @@ public class JSONDataManager {
      * @param jsonDataList parser of the JSON file
      * @param frameInfo the data structure where the frame info shall be saved
      */
-    private void readFrameInformation(JSONObject jsonDataList, FrameInfo frameInfo) {
+    private static void readFrameInformation(JSONObject jsonDataList, FrameInfo frameInfo) {
         JSONObject jsonFrameRead = (JSONObject) jsonDataList.get("Frame Info");
 
         String illumination = (String) jsonFrameRead.get("illumination");

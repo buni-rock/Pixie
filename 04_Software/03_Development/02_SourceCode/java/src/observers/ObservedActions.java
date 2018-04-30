@@ -116,12 +116,16 @@ public class ObservedActions {
          */
         UPDATE_CROP_OF_OBJECT,
         /**
+         * A polygon object was edited and now it has to be updated.
+         */
+        UPDATE_POLYGON,
+        /**
          * Add the key event dispatcher.
          */
         ADD_GUI_KEY_EVENT_DISPATCHER,
         /**
          * An object which is under edit mode moved and the operation has to be
-         * reflected in the gui.
+         * reflected in the GUI.
          */
         SELECTED_OBJECT_MOVED,
         /**
@@ -176,6 +180,11 @@ public class ObservedActions {
         /**
          * The window for the edit of attributes should be shown.
          */
-        DISPLAY_EDIT_ATTRIBUTES_WIN
+        DISPLAY_EDIT_ATTRIBUTES_WIN,
+        /**
+         * The vertices of the polygon were changed and the original object has
+         * to be updated.
+         */
+        UPDATE_POLYGON_VERTICES
     }
 }

@@ -64,6 +64,10 @@ public class DrawConstants {
          * Draw polygon draw type.
          */
         DRAW_POLYGON,       // draw a polygon made of n vertices
+	/**
+         * Switch to the edit polygon mode.
+         */
+        EDIT_POLYGON_VERTICES,
         /**
          * The Edit mode.
          */

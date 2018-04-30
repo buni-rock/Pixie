@@ -296,7 +296,7 @@ public class Constants {
     /**
      * The constant IMG_EXTENSION_LIST.
      */
-    public static final List<String> IMG_EXTENSION_LIST = Arrays.asList("bmp", "jpg", "jpeg", "png");
+    public static final List<String> IMG_EXTENSION_LIST = Arrays.asList("bmp", "jpg", "jpeg", "png", "bin");
     /**
      * The constant VIDEO_EXTENSION_LIST.
      */

@@ -304,21 +304,6 @@ public class ObjectScribble extends Objects {
         outerBBox = moveBox(xOffset, yOffset, outerBBox);
     }
 
-    /**
-     * Moves one box with the specified offset and returns the new image
-     * coordinates.
-     *
-     * @param xOffset    - how much should the object move on the X axis
-     * @param yOffset    - how much the object should move on the Y axis
-     * @param boxPosOrig - the position of the selected box in image coordinates
-     * @return - the new image coordinates of the box
-     */
-    public Rectangle moveBox(int xOffset, int yOffset, Rectangle boxPosOrig) {
-        boxPosOrig.setLocation(boxPosOrig.x + xOffset, boxPosOrig.y + yOffset);
-
-        return boxPosOrig;
-    }
-
     @Override
     public boolean remove(Rectangle coordPanelBox, Resize resizeRate) {
         // if the outer box is selected, the whole object shall be erased, therefore it will be done in the parent method; else remove only the selected crop
@@ -438,5 +423,20 @@ public class ObjectScribble extends Objects {
         }
 
         return null;
+    }
+	
+	@Override
+    public void move(int xOffset, int yOffset, Dimension frameSize) {
+        // move only if by moving we do not get out of the image
+        if ((outerBBox.x + xOffset >= 0)
+                && (outerBBox.y + yOffset >= 0)
+                && (outerBBox.x + outerBBox.width + xOffset <= frameSize.width)
+                && (outerBBox.y + outerBBox.height + yOffset <= frameSize.height)) {
+            // move the outer bounding box; the crop will move as well because it is the same object
+            moveBox(xOffset, yOffset, outerBBox);
+
+            // if the label was changed, it means that the user touched it, therefore the segmentation is manual
+            segmentationSource = ConstantsLabeling.LABEL_SOURCE_MANUAL;
+        }
     }
 }

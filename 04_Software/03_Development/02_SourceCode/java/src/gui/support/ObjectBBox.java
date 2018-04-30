@@ -49,7 +49,7 @@ public class ObjectBBox extends Objects {
     }
 
     @Override
-    public void move(int xOffset, int yOffset, Rectangle coordPanelBox, Resize resizeRate, Dimension frameSize) {
+    public void move(int xOffset, int yOffset, Dimension frameSize) {
         // move only if by moving we do not get out of the image
         if ((outerBBox.x + xOffset >= 0)
                 && (outerBBox.y + yOffset >= 0)
@@ -61,18 +61,6 @@ public class ObjectBBox extends Objects {
             // if the label was changed, it means that the user touched it, therefore the segmentation is manual
             segmentationSource = ConstantsLabeling.LABEL_SOURCE_MANUAL;
         }
-    }
-
-    /**
-     * Moves one box with the specified offset.
-     *
-     * @param xOffset    - how much should the object move on the X axis
-     * @param yOffset    - how much the object should move on the Y axis
-     * @param boxPosOrig - the initial position of the selected box in image coordinates
-     */
-    public void moveBox(int xOffset, int yOffset, Rectangle boxPosOrig) {
-
-        boxPosOrig.setLocation(boxPosOrig.x + xOffset, boxPosOrig.y + yOffset);
     }
 
     @Override
@@ -128,4 +116,8 @@ public class ObjectBBox extends Objects {
         return outerBBoxPanel.equals(coordPanelBox);
     }
 
+	@Override
+    public void move(int xOffset, int yOffset, Rectangle coordPanelBox, Resize resizeRate, Dimension frameSize) {
+        move(xOffset, yOffset, frameSize);
+    }
 }

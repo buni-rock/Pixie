@@ -25,40 +25,41 @@
  */
 package gui.actions;
 
-import gui.viewer.AttributesDefinition;
-import gui.viewer.BoundingBoxWindow;
-import gui.viewer.CropWindow;
-import gui.viewer.GUILabelingTool;
-import common.*;
+import gui.editobject.SemanticObjEdit;
+import common.Constants;
+import common.ConstantsLabeling;
+import common.UserPreferences;
+import common.Utils;
+import commonsegmentation.ScribbleInfo;
+import gui.editobject.BoxEdit;
+import gui.editobject.CropEdit;
+import gui.editobject.EditWindow;
+import gui.editobject.PolygonObjEdit;
 import gui.support.*;
 import gui.support.Objects;
+import gui.viewer.AttributesDefinition;
+import gui.viewer.GUILabelingTool;
 import observers.NotifyObservers;
 import observers.ObservedActions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import paintpanels.DrawConstants;
 import paintpanels.DrawingPanel;
 import paintpanels.ResultPanel;
+import segmentation.MattingThreading;
 import videomodule.PlayImagesRunnable;
-import commonsegmentation.ScribbleInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.List;
 import java.util.logging.Level;
-import javax.imageio.ImageIO;
-import segmentation.MattingThreading;
 
 /**
- * The type Gui controller.
+ * The type gui controller.
  *
  * @author Olimpia Popica
  */
@@ -82,10 +83,15 @@ public class GUIController implements Observer {
     protected Thread videoThread;
 
     /**
-     * The list of objects which were segmented. Contains the list of crops
-     * needed to segment the objects.
+     * The list of objects which were segmented.
      */
     protected List<Objects> objectList;
+
+    /**
+     * The temporary list of objects which were segmented. It is intended to be
+     * used for copy-paste of objects.
+     */
+    protected List<Objects> tempObjectList;
 
     /**
      * The object being currently segmented.
@@ -112,13 +118,13 @@ public class GUIController implements Observer {
     /**
      * An instance of the window displaying the crop to be labeled.
      */
-    private CropWindow cropWindow;
+    private CropEdit cropWindow;
     private CropWindowConfig cropWindowCfg;
 
     /**
      * Display the segmented box and the attributes to be chosen for the object.
      */
-    private BoundingBoxWindow bbWindow;
+    private EditWindow editWindow;
 
     /**
      * User preferences related to the application.
@@ -373,21 +379,21 @@ public class GUIController implements Observer {
 
         if ((currentObject.getOuterBBox().width > 0) && (currentObject.getOuterBBox().height > 0)) {
 
-            bbWindow = new BoundingBoxWindow(null,
+            editWindow = new BoxEdit(null,
                     dPImgToLabel.getOrigImg(),
                     currentObject,
-                    getObjAttribTree(objectAttributes, userPrefs.isCheckObjectAttributes()),
+                    objectAttributes,
                     ObservedActions.Action.SAVE_BOUNDING_BOX,
                     objColorsList,
                     userPrefs);
 
-            bbWindow.addObserver(this);
-            bbWindow.removeOtherKeyEventDispatcher();
+            editWindow.addObserver(this);
 
-            bbWindow.setLocation(Utils.winLocRelativeToMouse(bbWindow.getSize()));
+            editWindow.removeOtherKeyEventDispatcher();
 
-            bbWindow.setVisible(true);
+            editWindow.setLocation(Utils.winLocRelativeToMouse(editWindow.getSize()));
 
+            editWindow.setVisible(true);
         }
     }
 
@@ -413,14 +419,15 @@ public class GUIController implements Observer {
         cropWindowCfg.setObjectId(currentObject.getObjectId());
 
         if ((cropObj.getPositionOrig().getWidth() > 0) && (cropObj.getPositionOrig().getHeight() > 0)) {
-            cropWindow = new CropWindow(null,
+            cropWindow = new gui.editobject.CropEdit(null,
                     dPImgToLabel.getOrigImg(),
                     cropObj,
                     cropWindowCfg,
                     getObjAttribTree(objectAttributes, userPrefs.isCheckObjectAttributes()),
                     ObservedActions.Action.ADD_CROP_TO_OBJECT,
                     objColorsList,
-                    userPrefs);
+                    userPrefs,
+                    currentObject.getUserPreference());
 
             cropWindow.addObserver(this);
             cropWindow.removeOtherKeyEventDispatcher();
@@ -461,6 +468,8 @@ public class GUIController implements Observer {
                             // open bounding box edit mode
                             editBox();
                             return;
+                        } else if (obj instanceof ObjectPolygon) {
+                            editPolygon();
                         } else if (obj instanceof ObjectScribble) {
                             Rectangle objBoxPanel = dPImgToLabel.getResize().originalToResized(obj.getOuterBBox());
                             if (objBoxPanel.equals(selectedBox.getPanelBox()) && (((ObjectScribble) obj).getCrop(selectedBox.getPanelBox(), dPImgToLabel.getResize()) == null)) {
@@ -483,7 +492,7 @@ public class GUIController implements Observer {
      * Edit the whole object; open it in a new window.
      */
     private void editObjectScribble() {
-        bbWindow = new BoundingBoxWindow(null,
+        editWindow = new SemanticObjEdit(null,
                 dPImgToLabel.getOrigImg(),
                 currentObject,
                 getObjAttribTree(objectAttributes, userPrefs.isCheckObjectAttributes()),
@@ -491,28 +500,28 @@ public class GUIController implements Observer {
                 objColorsList,
                 userPrefs);
 
-        bbWindow.addObserver(this);
-        bbWindow.removeOtherKeyEventDispatcher();
+        editWindow.addObserver(this);
+        editWindow.removeOtherKeyEventDispatcher();
 
-        bbWindow.setLocationRelativeTo(dPImgToLabel);
+        editWindow.setLocationRelativeTo(dPImgToLabel);
 
         if ((currentObject.getObjectType() != null)
                 && (currentObject.getObjectClass() != null)
                 && (currentObject.getObjectValue() != null)) {
-            bbWindow.setTypeClassValOcc(currentObject.getObjectType(),
+            editWindow.setTypeClassValOcc(currentObject.getObjectType(),
                     currentObject.getObjectClass(),
                     currentObject.getObjectValue(),
                     currentObject.getOccluded());
         }
 
-        bbWindow.setVisible(true);
+        editWindow.setVisible(true);
     }
 
     /**
      * Edit the selected bounding box.
      */
     private void editBox() {
-        bbWindow = new BoundingBoxWindow(null,
+        editWindow = new BoxEdit(null,
                 dPImgToLabel.getOrigImg(),
                 currentObject,
                 getObjAttribTree(objectAttributes, userPrefs.isCheckObjectAttributes()),
@@ -520,17 +529,42 @@ public class GUIController implements Observer {
                 objColorsList,
                 userPrefs);
 
-        bbWindow.addObserver(this);
-        bbWindow.removeOtherKeyEventDispatcher();
+        editWindow.addObserver(this);
+        editWindow.removeOtherKeyEventDispatcher();
 
-        bbWindow.setLocationRelativeTo(dPImgToLabel);
+        editWindow.setLocationRelativeTo(dPImgToLabel);
 
-        bbWindow.setTypeClassValOcc(currentObject.getObjectType(),
+        editWindow.setTypeClassValOcc(currentObject.getObjectType(),
                 currentObject.getObjectClass(),
                 currentObject.getObjectValue(),
                 currentObject.getOccluded());
 
-        bbWindow.setVisible(true);
+        editWindow.setVisible(true);
+    }
+
+    /**
+     * Edit the selected bounding polygon.
+     */
+    private void editPolygon() {
+        editWindow = new PolygonObjEdit(null,
+                dPImgToLabel.getOrigImg(),
+                currentObject,
+                getObjAttribTree(objectAttributes, userPrefs.isCheckObjectAttributes()),
+                ObservedActions.Action.UPDATE_POLYGON,
+                objColorsList,
+                userPrefs);
+
+        editWindow.addObserver(this);
+        editWindow.removeOtherKeyEventDispatcher();
+
+        editWindow.setLocationRelativeTo(dPImgToLabel);
+
+        editWindow.setTypeClassValOcc(currentObject.getObjectType(),
+                currentObject.getObjectClass(),
+                currentObject.getObjectValue(),
+                currentObject.getOccluded());
+
+        editWindow.setVisible(true);
     }
 
     /**
@@ -556,14 +590,15 @@ public class GUIController implements Observer {
             cropWindowCfg.setObjectId(currentObject.getObjectId());
 
             // create new window
-            cropWindow = new CropWindow(null,
+            cropWindow = new gui.editobject.CropEdit(null,
                     dPImgToLabel.getOrigImg(),
                     cropObj,
                     cropWindowCfg,
                     getObjAttribTree(objectAttributes, userPrefs.isCheckObjectAttributes()),
                     ObservedActions.Action.UPDATE_CROP_OF_OBJECT,
                     objColorsList,
-                    userPrefs);
+                    userPrefs,
+                    currentObject.getUserPreference());
 
             cropWindow.addObserver(this);
             cropWindow.removeOtherKeyEventDispatcher();
@@ -715,11 +750,31 @@ public class GUIController implements Observer {
         currentObject.getCurrentLabelingDuration().stop("scribble object edit");
 
         // update the color of the image result panel for current color
-        dPImgResult.setObjColor(bbWindow.getObjectColor());
+        dPImgResult.setObjColor(editWindow.getObjectColor());
 
         // merge the result and refresh the panel the result image
         dPImgResult.mergeCrop(((ObjectScribble) currentObject).getObjectMap(), currentObject.getOuterBBox(), currentObject.getObjectId(), false);
         dPImgResult.updateResultImg(objectList);
+
+        // notify that the object might be changed, therefore reload the objects
+        observable.notifyObservers(ObservedActions.Action.REFRESH_OBJ_LIST_PANEL);
+
+        // the color of the object might have changed, update it
+        reinitObjectColorsList();
+
+        // refresh the objects displayed (for color changes)
+        refreshDisplayList();
+    }
+
+    /**
+     * Updates the polygon object with the new data.
+     */
+    private void updateObjPolygon() {
+        // save the edit time of the object
+        currentObject.getCurrentLabelingDuration().stop("polygon object edit");
+
+        // recompute the outer box
+        currentObject.computeOuterBBoxCurObj();
 
         // notify that the object might be changed, therefore reload the objects
         observable.notifyObservers(ObservedActions.Action.REFRESH_OBJ_LIST_PANEL);
@@ -1036,6 +1091,13 @@ public class GUIController implements Observer {
 
                 case UPDATE_OBJECT_SCRIBBLE:
                     updateObjScribble();
+
+                    // send the object to server
+                    sendLabel(currentObject);
+                    break;
+
+                case UPDATE_POLYGON:
+                    updateObjPolygon();
 
                     // send the object to server
                     sendLabel(currentObject);
@@ -1518,7 +1580,7 @@ public class GUIController implements Observer {
         List<DisplayBBox> positions = new ArrayList<>();
 
         // for scribble segmentation the current object parts have to be displayed before the save of the object
-        if (currentObject != null) {
+        if ((currentObject != null) && (dPImgToLabel.getDrawType() != DrawConstants.DrawType.EDIT_MODE)) {
             // add the current object which is in progress
             showCrops(currentObject, positions);
 
@@ -1914,51 +1976,6 @@ public class GUIController implements Observer {
     }
 
     /**
-     * Pop up the objects for review if the user chose to check them.
-     */
-    public void popUpObjects() {
-        if (userPrefs.isPopUpObjects()) {
-            if ((objectList != null) && (objectList.size() > 0)) {
-
-                // MAT-281: make a shallow copy of the array list; else when an object is erased, there will be ConcurrentModificationException
-                List<Objects> tempObjList = new ArrayList<>(objectList);
-
-                for (Objects obj : tempObjList) {
-                    // set the object as the current one
-                    currentObject = obj;
-
-                    // select the object in the image
-                    dPImgToLabel.setSelectedBox(currentObject.getOuterBBox());
-
-                    // highlight the object in the side object list
-                    observable.notifyObservers(ObservedActions.Action.HIGHLIGHT_OBJECT);
-
-                    // refresh the display to mark the selected box
-                    refreshDisplayList();
-
-                    // start counting the times for edit
-                    currentObject.newLabelingDuration().start();
-
-                    if (obj instanceof ObjectBBox) {
-                        // open bounding box edit mode
-                        editBox();
-
-                    } else if (obj instanceof ObjectScribble) {
-                        // open the entire object
-                        editObjectScribble();
-                    }
-                }
-
-                // update the result image with all the merged objects
-                dPImgResult.updateResultImg(objectList);
-
-                // cancel the current object to avoid issues in displaying the objects ???
-                cancelCurrentObject();
-            }
-        }
-    }
-
-    /**
      * Enables the user to draw one time a crop, which will be added to the
      * current object.
      */
@@ -2065,7 +2082,7 @@ public class GUIController implements Observer {
             // compute the object outerbox
             currentObject.computeOuterBBoxCurObj();
 
-            bbWindow = new BoundingBoxWindow(null,
+            editWindow = new gui.editobject.PolygonObjEdit(null,
                     dPImgToLabel.getOrigImg(),
                     currentObject,
                     getObjAttribTree(objectAttributes, userPrefs.isCheckObjectAttributes()),
@@ -2073,13 +2090,13 @@ public class GUIController implements Observer {
                     objColorsList,
                     userPrefs);
 
-            bbWindow.addObserver(this);
+            editWindow.addObserver(this);
 
-            bbWindow.removeOtherKeyEventDispatcher();
+            editWindow.removeOtherKeyEventDispatcher();
 
-            bbWindow.setLocation(Utils.winLocRelativeToMouse(bbWindow.getSize()));
+            editWindow.setLocation(Utils.winLocRelativeToMouse(editWindow.getSize()));
 
-            bbWindow.setVisible(true);
+            editWindow.setVisible(true);
         }
     }
 
@@ -2353,9 +2370,9 @@ public class GUIController implements Observer {
             return;
         }
 
-        if (bbWindow != null) {
-            bbWindow.setObjectAttributes(getObjAttribTree(objectAttributes, userPrefs.isCheckObjectAttributes()));
-            bbWindow.setTypeClassValOcc(currentObject.getObjectType(),
+        if (editWindow != null) {
+            editWindow.setObjectAttributes(getObjAttribTree(objectAttributes, userPrefs.isCheckObjectAttributes()));
+            editWindow.setTypeClassValOcc(currentObject.getObjectType(),
                     currentObject.getObjectClass(),
                     currentObject.getObjectValue(),
                     currentObject.getOccluded());
@@ -2534,5 +2551,51 @@ public class GUIController implements Observer {
         }
 
         return frameAttributes;
+    }
+
+    /**
+     * Copy the list of segmented objects in a temp list, in order to paste it
+     * in another frame.
+     */
+    public void copyObjList() {
+        tempObjectList = new ArrayList<>();
+        for (Objects object : objectList) {
+            tempObjectList.add(object);
+        }
+    }
+
+    /**
+     * Paste the saved list of objects, in the current list. Do it just for the
+     * cases when the object id is not already in the current list.
+     */
+    public void pasteObjList() {
+        for (Objects object : tempObjectList) {
+            if (!isObjectInList(object)) {
+                objectList.add(object);
+                // notify that a new object was added on the list and it has to be displayed in the list
+                observable.notifyObservers(ObservedActions.Action.ADD_OBJECT_ON_PANEL);
+            }
+        }
+
+        /* update the drawing panel*/
+        refreshDisplayList();
+    }
+
+    /**
+     * Check if the specified object exists in the objects list; or if an object
+     * with the same id exists in list.
+     *
+     * @param object the object being verified
+     * @return true if an object with the specified id exists in list; false if
+     * the id is not found in list
+     */
+    public boolean isObjectInList(Objects object) {
+        for (Objects obj : objectList) {
+            if (obj.getObjectId() == object.getObjectId()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
